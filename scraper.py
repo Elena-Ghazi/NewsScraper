@@ -2,6 +2,25 @@ import requests
 from bs4 import BeautifulSoup
 from tabulate import tabulate
 import argparse
+def news(limit):
+    URL = 'https://www.bbc.com/'
+    page = requests.get(URL)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    temp1 = []
+    temp2 = []
+    temp1 = soup.find_all('div', class_ = "media media--hero media--primary media--overlay block-link")
+    temp2 = soup.find_all('div', class_ = "media media--overlay block-link")
+    top_stories = temp1 + temp2
+    if (limit!=None):
+        top_stories = top_stories[:limit]
+    L = []
+    for story in top_stories:
+        title = story.find('a', class_="media__link").text 
+        L.append([title])
+    print('\n')
+    print("BBC")
+    print(tabulate(L, headers = ["Title"], tablefmt = "fancy_grid"))
+
 
 def print_urgent(limit = -1):
     URL = 'https://www.lorientlejour.com/'
@@ -39,7 +58,11 @@ my_parser = argparse.ArgumentParser()
 my_parser.add_argument('--type', action = 'store', required = True)
 my_parser.add_argument('--limit', action = 'store', type = int)
 args = my_parser.parse_args()
+news(args.limit)
+print('\n')
+print("L'Orient-Le Jour")
 if args.type == "urgent":
     print_urgent(args.limit)
 elif args.type == "all":
     print_all(args.limit)
+print('\n')
